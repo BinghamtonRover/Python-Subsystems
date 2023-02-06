@@ -1,13 +1,7 @@
-import lib.services as services
+import lib.constants as constants
+from lib.can_to_udp import CanToUdp
+from lib.udp_to_can import UdpToCan
 
-service = services.CanService(test=True)
-# message_sender = services.MessageSender()
-# message_receiver = services.MessageReceiver()
-
-service.register_handler(1, handler=lambda x: print(x.data))
-service.mock_send(1, b"Hola")
-
-rover = services.Rover()
-rover.drive.brake()
-
-print("Done")
+can = CanToUdp()
+server = UdpToCan(constants.SUBSYSTEMS_DATA_PORT, can)
+server.start()
