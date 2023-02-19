@@ -7,9 +7,11 @@ class UdpToCan(ProtoServer):
 		self.can = can
 		self.client = client
 		self.received_handshake = False
-		self.is_connected = False
+		self.dashboard_ip = None
 		self.server_loop_count = 0
 		super().__init__(port)
+
+	def is_connected(self): return self.dashboard_ip is not None
 
 	# Overriden from UdpServer
 	def on_loop(self):
@@ -19,11 +21,12 @@ class UdpToCan(ProtoServer):
 		self.server_loop_count = 0
 
 		if not self.received_handshake: 
-			if self.is_connected: self.on_disconnect()
+			if self.is_connected(): self.on_disconnect()
 		else: self.received_handshake = False
 
 	def on_disconnect(self): 
-		self.is_connected = False
+		self.dashboard_ip = None
+		self.can.stop_driving()
 		print("Handshake not received. Assuming Dashboard has disconnected")
 
 	# This function comes from ProtoServer -- do not rename
@@ -31,9 +34,10 @@ class UdpToCan(ProtoServer):
 		if wrapper.name == Connect.DESCRIPTOR.name: 
 			handshake = Connect.FromString(wrapper.data)
 			if handshake.receiver != Device.SUBSYSTEMS: 
-				print(f"Received a handshake for {handshake.receiver}")
+				print(f"Received a misaddressed handshake intended for {handshake.receiver}, sent by {handshake.sender}")
 			self.received_handshake = True
-			self.is_connected = True
+			self.dashboard_ip = source[0]
+			self.client.address = self.dashboard_ip
 			self.client.send_message(Connect(sender=Device.SUBSYSTEMS, receiver=Device.DASHBOARD))
 		elif len(wrapper.data) > 8: 
 			print(f"{wrapper.name} is {len(wrapper.data)} bytes long, but CAN only supports 8")

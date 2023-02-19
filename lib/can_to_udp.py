@@ -1,8 +1,11 @@
 import can
+import logging
 
-from lib.errors import SubsystemException
 import lib.constants as constants
+from lib.network.generated.Protobuf.drive_pb2 import *
+from lib.errors import SubsystemException
 
+logging.disable(logging.CRITICAL)
 CAN_VERBOSE = True
 
 class SubsystemsListener: 
@@ -22,7 +25,7 @@ class SubsystemsListener:
 		else: 
 			name = constants.CAN_ID_TO_NAME[id]
 			print(f"  Message recognized as a {name} object")
-			self.client.send_raw(name, bytes(message.data), constants.DASHBOARD_IP, constants.DASHBOARD_DATA_PORT)
+			self.client.send_raw(name, bytes(message.data))
 
 class CanToUdp: 
 	def __init__(self, client, test=False): 
@@ -42,3 +45,11 @@ class CanToUdp:
 	def mock_send(self, id, data):  # sends without using the bus
 		message = can.Message(arbitration_id=id, data=data)
 		self.listener.on_message_received(message)
+
+	def stop_driving(self): 
+		command1 = DriveCommand(set_left=True, left=0)
+		command2 = DriveCommand(set_right=True, right=0)
+		command3 = DriveCommand(set_throttle=True, throttle=0)
+		self.send(0x53, command1)
+		self.send(0x53, command2)
+		self.send(0x53, command3)
