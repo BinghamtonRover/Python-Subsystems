@@ -22,6 +22,5 @@ CAN_ID_TO_NAME = {
 
 # These must match the IPs and ports found in the following Google Doc: 
 
-DASHBOARD_IP = "192.168.1.10"
 DASHBOARD_DATA_PORT = 8008
 SUBSYSTEMS_DATA_PORT = 8002

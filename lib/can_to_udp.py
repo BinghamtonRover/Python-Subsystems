@@ -23,7 +23,7 @@ class SubsystemsListener:
 		if id not in constants.CAN_ID_TO_NAME: return 
 		else: 
 			name = constants.CAN_ID_TO_NAME[id]
-			print(f"  Message recognized as a {name} object")
+			if self.client.address is None: return  # dashboard is not connected
 			self.client.send_raw(name, bytes(message.data))
 
 class CanToUdp: 
