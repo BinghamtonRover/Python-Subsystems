@@ -2,6 +2,8 @@ from lib.network import ProtoServer
 from lib.network.generated.Protobuf.core_pb2 import *
 from lib.constants import NAME_TO_CAN_ID
 
+heartbeat_interval = 5  # in seconds
+
 class UdpToCan(ProtoServer):
 	def __init__(self, port, can, client): 
 		self.can = can
@@ -15,19 +17,22 @@ class UdpToCan(ProtoServer):
 
 	# Overriden from UdpServer
 	def on_loop(self):
-		# Every 20 server checks
+		# Every 10 server checks is about a second
 		self.server_loop_count += 1
-		if self.server_loop_count != 100: return
+		if self.server_loop_count != (heartbeat_interval * 10): return
 		self.server_loop_count = 0
+
+		print("Checking for heartbeat")
 
 		if not self.received_handshake: 
 			if self.is_connected(): self.on_disconnect()
 		else: self.received_handshake = False
 
 	def on_disconnect(self): 
-		self.dashboard_ip = None
-		self.can.stop_driving()
 		print("Handshake not received. Assuming Dashboard has disconnected")
+		self.dashboard_ip = None
+		self.client.address = None
+		self.can.stop_driving()
 
 	# This function comes from ProtoServer -- do not rename
 	def on_message(self, wrapper, source): 

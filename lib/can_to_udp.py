@@ -1,5 +1,6 @@
 import can
 import logging
+logging.basicConfig(level=logging.CRITICAL)
 
 import lib.constants as constants
 from lib.network.generated.Protobuf.drive_pb2 import *
@@ -17,11 +18,9 @@ class SubsystemsListener:
 
 	def on_message_received(self, message): 
 		id = message.arbitration_id
-		# NOTE: Calling socket.recvfrom causes a CAN frame of ID=4 to be detected. 
+		# NOTE: Calling socket.recvfrom causes a CAN frame of random IDs to be detected. 
 		# Does not occur in candump, only in python-can with socketcan
-		if id == 4: return
-
-		if id not in constants.CAN_ID_TO_NAME: print(f"  Unrecognized ID")
+		if id not in constants.CAN_ID_TO_NAME: return 
 		else: 
 			name = constants.CAN_ID_TO_NAME[id]
 			print(f"  Message recognized as a {name} object")
@@ -50,6 +49,6 @@ class CanToUdp:
 		command1 = DriveCommand(set_left=True, left=0)
 		command2 = DriveCommand(set_right=True, right=0)
 		command3 = DriveCommand(set_throttle=True, throttle=0)
-		self.send(0x53, command1)
-		self.send(0x53, command2)
-		self.send(0x53, command3)
+		self.send(0x53, command1.SerializeToString())
+		self.send(0x53, command2.SerializeToString())
+		self.send(0x53, command3.SerializeToString())
