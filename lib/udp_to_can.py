@@ -32,7 +32,7 @@ class UdpToCan(ProtoServer):
 		self.client.address = None
 		self.can.stop_driving()
 
-	def handle_handshake(self): 
+	def on_handshake(self, handshake, source): 
 		if handshake.receiver != Device.SUBSYSTEMS: 
 			print(f"Received a misaddressed handshake intended for {handshake.receiver}, sent by {handshake.sender}")
 		self.received_handshake = True
@@ -44,10 +44,11 @@ class UdpToCan(ProtoServer):
 	def on_message(self, wrapper, source): 
 		if wrapper.name == Connect.DESCRIPTOR.name: 
 			handshake = Connect.FromString(wrapper.data)
-			self.handle_handshake(handshake)
+			self.on_handshake(handshake, source)
 		elif wrapper.name == UpdateSetting.DESCRIPTOR.name: 
 			settings = UpdateSetting.FromString(wrapper.data)
 			print(f"Received a request to update status={settings.status}")
+			self.client.send_message(settings)  # must send in return
 		elif len(wrapper.data) > 8: 
 			print(f"{wrapper.name} is {len(wrapper.data)} bytes long, but CAN only supports 8")
 		elif wrapper.name not in NAME_TO_CAN_ID: 
