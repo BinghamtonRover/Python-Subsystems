@@ -38,8 +38,10 @@ class CanToUdp:
 
 	def send(self, id, data): 
 		message = can.Message(arbitration_id=id, data=data, is_fd=False, is_extended_id=False)
-		print(f"Sending {message}")
-		self.bus.send(message)
+		try: self.bus.send(message)
+		except can.exceptions.CanOperationError as error: 
+			if error.error_code == 105: return
+			else: raise error from None
 
 	def mock_send(self, id, data):  # sends without using the bus
 		message = can.Message(arbitration_id=id, data=data)
@@ -52,3 +54,4 @@ class CanToUdp:
 		self.send(0x53, command1.SerializeToString())
 		self.send(0x53, command2.SerializeToString())
 		self.send(0x53, command3.SerializeToString())
+
