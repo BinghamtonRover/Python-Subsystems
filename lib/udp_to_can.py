@@ -2,6 +2,7 @@ import time
 
 from lib.network import ProtoServer
 from lib.network.generated.Protobuf.core_pb2 import *
+from lib.network.generated.Protobuf.autonomy_pb2 import *
 from lib.constants import NAME_TO_CAN_ID
 
 heartbeat_interval = 1  # in seconds
@@ -13,6 +14,7 @@ class UdpToCan(ProtoServer):
 		self.received_handshake = False
 		self.dashboard_ip = None
 		self.last_handshake_check = time.time()
+		self.status = RoverStatus.MANUAL
 		super().__init__(port)
 
 	def is_connected(self): return self.dashboard_ip is not None
@@ -50,6 +52,12 @@ class UdpToCan(ProtoServer):
 			settings = UpdateSetting.FromString(wrapper.data)
 			print(f"Received a request to update status={settings.status}")
 			self.client.send_message(settings)  # must send in return
+			self.status = settings.status
+			if settings.status == RoverStatus.AUTONOMOUS:
+				self.client.send_message(AutonomyCommand(enable=True), address="192.168.1.30", port=8006)
+			elif settings.status == RoverStatus.MANUAL:
+				self.client.send_message(AutonomyCommand(enable=False), address="192.168.1.30", port=8006)
+
 		elif len(wrapper.data) > 8: 
 			print(f"{wrapper.name} is {len(wrapper.data)} bytes long, but CAN only supports 8")
 		elif wrapper.name not in NAME_TO_CAN_ID: 
