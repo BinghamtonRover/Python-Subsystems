@@ -33,12 +33,13 @@ class UdpToCan(ProtoServer):
 		self.can.stop_driving()
 
 	def on_handshake(self, handshake, source): 
-		if handshake.receiver != Device.SUBSYSTEMS: 
-			print(f"Received a misaddressed handshake intended for {handshake.receiver}, sent by {handshake.sender}")
-		self.received_handshake = True
+		# if handshake.receiver != Device.SUBSYSTEMS: 
+		# 	print(f"Received a misaddressed handshake intended for {handshake.receiRver}, sent by {handshake.sender}")
+		# print("Got handshake from dashboard")
 		self.dashboard_ip = source[0]
 		self.client.address = self.dashboard_ip
 		self.client.send_message(Connect(sender=Device.SUBSYSTEMS, receiver=Device.DASHBOARD))
+		self.received_handshake = True
 
 	# This function comes from ProtoServer -- do not rename
 	def on_message(self, wrapper, source): 
