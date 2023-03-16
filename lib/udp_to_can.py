@@ -12,12 +12,11 @@ class UdpToCan(ProtoServer):
 		self.can = can
 		self.client = client
 		self.received_handshake = False
-		self.dashboard_ip = None
 		self.last_handshake_check = time.time()
 		self.status = RoverStatus.MANUAL
 		super().__init__(port)
 
-	def is_connected(self): return self.dashboard_ip is not None
+	def is_connected(self): return self.client.address is not None
 
 	# Overriden from UdpServer
 	def on_loop(self):
@@ -30,18 +29,34 @@ class UdpToCan(ProtoServer):
 
 	def on_disconnect(self): 
 		print("Handshake not received. Assuming Dashboard has disconnected")
-		self.dashboard_ip = None
 		self.client.address = None
 		self.can.stop_driving()
 
-	def on_handshake(self, handshake, source): 
-		# if handshake.receiver != Device.SUBSYSTEMS: 
-		# 	print(f"Received a misaddressed handshake intended for {handshake.receiRver}, sent by {handshake.sender}")
-		# print("Got handshake from dashboard")
-		self.dashboard_ip = source[0]
-		self.client.address = self.dashboard_ip
-		self.client.send_message(Connect(sender=Device.SUBSYSTEMS, receiver=Device.DASHBOARD))
+	def send_heartbeat(self): 
+		response = Connect(sender=Device.SUBSYSTEMS, receiver=Device.DASHBOARD)
+		self.client.send_message(response)
 		self.received_handshake = True
+
+
+	def on_handshake(self, handshake, source): 
+		"""Decides what to do when a heartbeat message has been received
+
+		- If the heartbeat was meant for another device, log it and ignore it
+		- If we are not connected to any dashboard, connect to it and respond
+		- If we are already connected to another dashboard, ignore it
+		- If it is our dashboard, respond to it
+		"""
+		if handshake.receiver != Device.SUBSYSTEMS:  # not meant for us
+			print(f"Received a misaddressed handshake intended for {handshake.receiever}, sent by {handshake.sender}")
+		elif not self.is_connected():  # new dashboard, let's connect
+			self.client.address = source[0]
+			self.client.port = source[1]
+			self.send_heartbeat()
+		elif self.client.address != source[0]:
+			# We're already connected to a dashboard, and a new one tried connecting -- ignore
+			return
+		else:  # heartbeat from the already-connected dashboard -- respond with a heartbeat back
+			self.send_heartbeat()
 
 	# This function comes from ProtoServer -- do not rename
 	def on_message(self, wrapper, source): 
