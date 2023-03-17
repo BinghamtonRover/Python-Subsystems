@@ -22,6 +22,6 @@ try:
 		try: subsystems.udp.listen()
 		except KeyboardInterrupt: break
 		except OSError as error: 
-			if error.errno == 10054: continue
+			if error.errno in (10054, 101): continue
 			else: raise error
 finally: subsystems.close()
