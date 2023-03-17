@@ -8,8 +8,8 @@ BLUE = (0, 0, 1)
 WHITE = (1, 1, 1)
 OFF = (0, 0, 0)
 
-RED_PIN = 13
-GREEN_PIN = 19
+RED_PIN = 19
+GREEN_PIN = 13
 BLUE_PIN = 26
 PWM_PIN = 17
 
