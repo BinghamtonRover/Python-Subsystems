@@ -1,4 +1,4 @@
-from lib.leds import Leds
+from lib.leds import *
 import time
 
 leds = Leds()
