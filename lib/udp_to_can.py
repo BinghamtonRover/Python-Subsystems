@@ -25,5 +25,5 @@ class UdpToCan(ProtoSocket):
 			print(f"No handler for {wrapper.name}")
 		else: 
 			id = NAME_TO_CAN_ID[wrapper.name]
-			# print(f"Received UDP message {wrapper.name}, sending CAN message to {id}")
+			# print(f"Received UDP message {wrapper.name}, sending CAN message to {id}: {wrapper.data}")
 			self.subsystems.can.send(id, wrapper.data)

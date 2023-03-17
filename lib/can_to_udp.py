@@ -4,7 +4,7 @@ logging.basicConfig(level=logging.CRITICAL)
 
 import lib.constants as constants
 from lib.errors import SubsystemException
-from network.generated import DriveCommand, DriveData
+from network.generated import DriveCommand, DriveData, WrappedMessage
 
 logging.disable(logging.CRITICAL)
 CAN_VERBOSE = True
@@ -25,7 +25,8 @@ class SubsystemsListener:
 			name = constants.CAN_ID_TO_NAME[id]
 			# print(f"Received {name} message from can ID {id}")
 			if self.subsystems.udp.destination is None: return  # dashboard is not connected
-			self.subsystems.udp.send_raw(name, bytes(message.data))
+			message = WrappedMessage(name=name, data=bytes(message.data))
+			self.subsystems.udp.send(message.SerializeToString())
 
 class CanToUdp: 
 	def __init__(self, subsystems, test=False): 
@@ -34,17 +35,22 @@ class CanToUdp:
 		else: 
 			self.bus = can.interface.Bus(interface="socketcan", channel="can0", fd=False)
 
+		print(self.bus)
 		self.udp_socket = None
 		self.listener = SubsystemsListener(subsystems)
 		self.notifier = can.Notifier(self.bus, [self.listener])
 
 	def send(self, id, data): 
 		message = can.Message(arbitration_id=id, data=data, is_fd=False, is_extended_id=False)
-		try: self.bus.send(message)
+		try: 
+			print(f"  Sent:{''.join(hex(x)[2:].zfill(2) for x in data)}")
+			self.bus.send(message)
 		except can.exceptions.CanOperationError as error: 
+			print(f"  Error sending data to id={id}")
 			# if error.error_code == 105: return
 			# else: raise error from None
-			pass
+			
+
 
 	def mock_send(self):  # sends without using the bus
 		data = DriveData(left=0.75).SerializeToString()
