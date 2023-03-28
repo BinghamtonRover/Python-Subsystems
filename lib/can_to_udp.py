@@ -23,18 +23,19 @@ class SubsystemsListener:
 		if id not in constants.CAN_ID_TO_NAME: return 
 		else: 
 			name = constants.CAN_ID_TO_NAME[id]
+			# print(f"Received {name} message from can ID {id}")
 			if self.subsystems.udp.destination is None: return  # dashboard is not connected
 			self.subsystems.udp.send_raw(name, bytes(message.data))
 
 class CanToUdp: 
-	def __init__(self, usbsystems, test=False): 
+	def __init__(self, subsystems, test=False): 
 		if (test): 
 			self.bus = can.interface.Bus('test_receive', bustype="virtual")
 		else: 
 			self.bus = can.interface.Bus(interface="socketcan", channel="can0", fd=False)
 
 		self.udp_socket = None
-		self.listener = SubsystemsListener(self)
+		self.listener = SubsystemsListener(subsystems)
 		self.notifier = can.Notifier(self.bus, [self.listener])
 
 	def send(self, id, data): 
@@ -44,8 +45,9 @@ class CanToUdp:
 			if error.error_code == 105: return
 			else: raise error from None
 
-	def mock_send(self, id, data):  # sends without using the bus
-		message = can.Message(arbitration_id=id, data=data)
+	def mock_send(self):  # sends without using the bus
+		data = DriveData(left=0.75).SerializeToString()
+		message = can.Message(arbitration_id=0x14, data=data)
 		self.listener.on_message_received(message)
 
 	def stop_driving(self): 
@@ -55,4 +57,3 @@ class CanToUdp:
 		self.send(0x53, command1.SerializeToString())
 		self.send(0x53, command2.SerializeToString())
 		self.send(0x53, command3.SerializeToString())
-

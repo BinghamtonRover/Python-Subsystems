@@ -18,7 +18,7 @@ class UdpToCan(ProtoSocket):
 		super().update_settings(settings)
 
 	# Overriden from ProtoSocket
-	def on_message(self, wrapper, source): 
+	def on_message(self, wrapper): 
 		if len(wrapper.data) > 8: 
 			print(f"{wrapper.name} is {len(wrapper.data)} bytes long, but CAN only supports 8")
 		elif wrapper.name not in NAME_TO_CAN_ID: 
@@ -26,4 +26,4 @@ class UdpToCan(ProtoSocket):
 		else: 
 			id = NAME_TO_CAN_ID[wrapper.name]
 			# print(f"Received UDP message {wrapper.name}, sending CAN message to {id}")
-			self.can.send(id, wrapper.data)
+			self.subsystems.can.send(id, wrapper.data)
