@@ -16,6 +16,12 @@ class Subsystems:
 		self.udp.close()
 
 subsystems = Subsystems()
-subsystems.can.mock_send()
-try: subsystems.udp.listen()
+
+try: 
+	while True: 
+		try: subsystems.udp.listen()
+		except KeyboardInterrupt: break
+		except OSError as error: 
+			if error.errno == 10054: continue
+			else: raise error
 finally: subsystems.close()
