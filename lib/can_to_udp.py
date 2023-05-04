@@ -4,7 +4,7 @@ logging.basicConfig(level=logging.CRITICAL)
 
 import lib.constants as constants
 from lib.errors import SubsystemException
-from network.src.generated.Protobuf.drive_pb2 import *
+from network.generated import DriveCommand, DriveData
 
 logging.disable(logging.CRITICAL)
 CAN_VERBOSE = True

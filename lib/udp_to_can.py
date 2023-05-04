@@ -1,7 +1,6 @@
 import time 
 
 from network import ProtoSocket, Device
-from network.src.generated.Protobuf.autonomy_pb2 import *
 from lib.constants import NAME_TO_CAN_ID
 
 class UdpToCan(ProtoSocket):
@@ -12,6 +11,7 @@ class UdpToCan(ProtoSocket):
 	# Overriden from ProtoSocket
 	def on_disconnect(self): 
 		self.subsystems.can.stop_driving()
+		super().on_disconnect()
 
 	def update_settings(self, settings): 
 		print(f"Changing status to {settings.status}")
