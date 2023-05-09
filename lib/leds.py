@@ -15,6 +15,7 @@ class Leds:
 
 	def __init__(self): 
 		system("sudo pigpiod")
+		time.sleep(1)
 		self.gpio = pigpio.pi()
 		if not self.gpio.connected:
 			print("[Error] PiGPIO is not running")
