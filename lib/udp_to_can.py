@@ -2,10 +2,12 @@ import time
 
 from network import ProtoSocket, Device
 from lib.constants import NAME_TO_CAN_ID
+from lib.leds import *
 
 class UdpToCan(ProtoSocket):
 	def __init__(self, port, subsystems): 
 		self.subsystems = subsystems
+		self.leds = Leds()
 		super().__init__(port, device=Device.SUBSYSTEMS)
 
 	# Overriden from ProtoSocket
@@ -16,6 +18,10 @@ class UdpToCan(ProtoSocket):
 	def update_settings(self, settings): 
 		print(f"Changing status to {settings.status}")
 		super().update_settings(settings)
+
+	def update_settings(self, settings): 
+		super().update_settings(settings)
+		self.leds.set(settings.color)
 
 	# Overriden from ProtoSocket
 	def on_message(self, wrapper): 
