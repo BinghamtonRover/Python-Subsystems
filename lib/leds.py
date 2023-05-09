@@ -1,4 +1,5 @@
 import pigpio
+from os import system
 
 class Leds: 
 	RED = (1, 0, 0)
@@ -13,12 +14,12 @@ class Leds:
 	PWM_PIN = 17
 
 	def __init__(self): 
+		system("sudo pigpiod")
 		self.gpio = pigpio.pi()
-		if self.gpio.connected:
-			print("Tank successfully initialized")
-		else:
+		if not self.gpio.connected:
 			print("[Error] PiGPIO is not running")
 			quit()
+		print("Tank successfully initialized")
 		self.gpio.set_mode(RED_PIN, pigpio.OUTPUT)
 		self.gpio.set_mode(GREEN_PIN, pigpio.OUTPUT)
 		self.gpio.set_mode(BLUE_PIN, pigpio.OUTPUT)
