@@ -34,6 +34,6 @@ class Leds:
 
 	def set(self, color):
 		r, g, b = color
-		self.gpio.write(RED_PIN, r)
-		self.gpio.write(GREEN_PIN, g)
-		self.gpio.write(BLUE_PIN, b)
+		self.gpio.set_PWM_dutycycle(RED_PIN, r*255)
+		self.gpio.set_PWM_dutycycle(GREEN_PIN, g*255)
+		self.gpio.set_PWM_dutycycle(BLUE_PIN, b*255)
