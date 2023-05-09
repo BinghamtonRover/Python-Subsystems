@@ -16,10 +16,6 @@ class UdpToCan(ProtoSocket):
 		super().on_disconnect()
 
 	def update_settings(self, settings): 
-		print(f"Changing status to {settings.status}")
-		super().update_settings(settings)
-
-	def update_settings(self, settings): 
 		super().update_settings(settings)
 		self.leds.set(settings.color)
 
