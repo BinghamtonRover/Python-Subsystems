@@ -1,16 +1,20 @@
-from lib.leds import *
 import time
 
-leds = Leds()
-leds.set(RED)
-time.sleep(1)
-leds.set(GREEN)
-time.sleep(1)
-leds.set(BLUE)
-time.sleep(1)
-leds.set( (0.75, 0, 0.25) )
-time.sleep(1)
-leds.set(WHITE)
-time.sleep(1)
-leds.set(OFF)
-time.sleep(1)
+from network import ProtoSocket, Device
+from network.generated import UpdateSettings, Color
+from lib.leds import *
+
+socket = ProtoSocket(port=8000, device=Device.DASHBOARD, destination=("127.0.0.1", 8001))
+red = Color(red=1, green=0, blue=0)
+green = Color(red=0, green=1, blue=0)
+blue = Color(red=0, green=0, blue=1)
+custom = Color(red=0.75, green=0, blue=0.25)
+
+if __name__ == '__main__':
+	socket.send_message(UpdateSettings(color=red))
+	time.sleep(1)
+	socket.send_message(UpdateSettings(color=red))
+	time.sleep(1)
+	socket.send_message(UpdateSettings(color=red))
+	time.sleep(1)
+	socket.send_message(UpdateSettings(color=custom))
