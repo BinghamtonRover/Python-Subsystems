@@ -2,18 +2,18 @@ import pigpio
 import time
 from os import system
 
+RED = (1, 0, 0)
+GREEN = (0, 1, 0)
+BLUE = (0, 0, 1)
+WHITE = (1, 1, 1)
+OFF = (0, 0, 0)
+
+RED_PIN = 13
+GREEN_PIN = 19
+BLUE_PIN = 26
+PWM_PIN = 17
+
 class Leds: 
-	RED = (1, 0, 0)
-	GREEN = (0, 1, 0)
-	BLUE = (0, 0, 1)
-	WHITE = (1, 1, 1)
-	OFF = (0, 0, 0)
-
-	RED_PIN = 13
-	GREEN_PIN = 19
-	BLUE_PIN = 26
-	PWM_PIN = 17
-
 	def init_pigpiod(self): 
 		self.gpio = pigpio.pi()
 		if self.gpio.connected: return

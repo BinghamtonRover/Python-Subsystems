@@ -2,13 +2,13 @@ from lib.leds import Leds
 import time
 
 leds = Leds()
-leds.set(Leds.RED)
+leds.set(RED)
 time.sleep(1)
-leds.set(Leds.BLUE)
+leds.set(BLUE)
 time.sleep(1)
-leds.set(Leds.GREEN)
+leds.set(GREEN)
 time.sleep(1)
-leds.set(Leds.WHITE)
+leds.set(WHITE)
 time.sleep(1)
-leds.set(Leds.OFF)
+leds.set(OFF)
 time.sleep(1)
