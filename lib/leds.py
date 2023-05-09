@@ -33,7 +33,6 @@ class Leds:
 		print("Initialized LED strip")
 
 	def set(self, color):
-		r, g, b = color
-		self.gpio.set_PWM_dutycycle(RED_PIN, r*255)
-		self.gpio.set_PWM_dutycycle(GREEN_PIN, g*255)
-		self.gpio.set_PWM_dutycycle(BLUE_PIN, b*255)
+		self.gpio.set_PWM_dutycycle(RED_PIN, color.red*255)
+		self.gpio.set_PWM_dutycycle(GREEN_PIN, color.green*255)
+		self.gpio.set_PWM_dutycycle(BLUE_PIN, color.blue*255)
