@@ -24,11 +24,8 @@ class Leds:
 	def init_pigpiod(self): 
 		self.gpio = pigpio.pi()
 		if self.gpio.connected: return
-		system("sudo pigpiod")
-		time.sleep(1)
-		if not self.gpio.connected: 
-			print("[Error] Could not initialize pigpiod")
-			quit()		
+		print("[Error] Could not initialize pigpiod")
+		quit()
 
 	def set(self, color):
 		"""Sets the LED strip to [color], a Protobuf [Color] message."""
