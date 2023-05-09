@@ -1,5 +1,6 @@
 import pigpio
 from os import system
+from time import sleep
 
 class Leds: 
 	RED = (1, 0, 0)
