@@ -12,6 +12,7 @@ blue = Color(red=0, green=0, blue=1)
 custom = Color(red=0.75, green=0, blue=0.25)
 
 if __name__ == '__main__':
+# 	while True: socket.send_message(UpdateSetting(color=None))
 	socket.send_message(UpdateSetting(color=red))
 	time.sleep(0.2)
 	socket.send_message(UpdateSetting(color=blue))

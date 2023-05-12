@@ -23,7 +23,7 @@ class SubsystemsListener:
 		if id not in constants.CAN_ID_TO_NAME: return 
 		else: 
 			name = constants.CAN_ID_TO_NAME[id]
-			# print(f"Received {name} message from can ID {id}")
+			# print(f"Received {name} message from can ID {hex(id)}: {''.join(hex(x)[2:].zfill(2) for x in message.data)}")
 			if self.subsystems.udp.destination is None: return  # dashboard is not connected
 			message = WrappedMessage(name=name, data=bytes(message.data))
 			self.subsystems.udp.send(message.SerializeToString())
