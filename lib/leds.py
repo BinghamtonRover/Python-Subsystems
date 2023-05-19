@@ -12,16 +12,19 @@ class Leds:
 
 	This class uses PiGPIO to manage the GPIO pins on the Pi, which requires the pigpiod daemon.
 	"""
-	def __init__(self): 
-		self.init_pigpiod()
-		self.gpio.set_mode(RED_PIN, pigpio.OUTPUT)
-		self.gpio.set_mode(GREEN_PIN, pigpio.OUTPUT)
-		self.gpio.set_mode(BLUE_PIN, pigpio.OUTPUT)
-		self.gpio.set_mode(PWM_PIN, pigpio.INPUT)
-		self.gpio.set_pull_up_down(PWM_PIN, 2)
+	def __init__(self, test=False): 
+		self.test = test
+		if not self.test:
+			self.init_pigpiod()
+			self.gpio.set_mode(RED_PIN, pigpio.OUTPUT)
+			self.gpio.set_mode(GREEN_PIN, pigpio.OUTPUT)
+			self.gpio.set_mode(BLUE_PIN, pigpio.OUTPUT)
+			self.gpio.set_mode(PWM_PIN, pigpio.INPUT)
+			self.gpio.set_pull_up_down(PWM_PIN, 2)
 		print("Initialized LED strip")
 
 	def init_pigpiod(self): 
+		if self.test: return
 		self.gpio = pigpio.pi()
 		if self.gpio.connected: return
 		print("[Error] Could not initialize pigpiod")
@@ -29,6 +32,7 @@ class Leds:
 
 	def set(self, color):
 		"""Sets the LED strip to [color], a Protobuf [Color] message."""
+		if self.test: return
 		self.gpio.set_PWM_dutycycle(RED_PIN, color.red*255)
 		self.gpio.set_PWM_dutycycle(GREEN_PIN, color.green*255)
 		self.gpio.set_PWM_dutycycle(BLUE_PIN, color.blue*255)
