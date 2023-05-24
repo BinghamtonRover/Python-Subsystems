@@ -1,6 +1,6 @@
 import pigpio
 import time
-from os import system
+import sys
 
 RED_PIN = 19
 GREEN_PIN = 13
@@ -13,6 +13,9 @@ class Leds:
 	This class uses PiGPIO to manage the GPIO pins on the Pi, which requires the pigpiod daemon.
 	"""
 	def __init__(self, test=False): 
+		if sys.platform != "linux": 
+			print("[Warning] Switching to virtual LEDS on non-Linux platform")
+			test = True
 		self.test = test
 		if not self.test:
 			self.init_pigpiod()

@@ -1,4 +1,5 @@
 import can
+import sys
 import logging
 logging.basicConfig(level=logging.CRITICAL)
 
@@ -30,12 +31,14 @@ class SubsystemsListener:
 
 class CanToUdp: 
 	def __init__(self, subsystems, test=False): 
+		if sys.platform != "linux": 
+			print("[Warning]: Switching] to virtual CAN on non-Linux platform")
+			test = True
 		if (test): 
 			self.bus = can.interface.Bus('test_receive', bustype="virtual")
 		else: 
 			self.bus = can.interface.Bus(interface="socketcan", channel="can0", fd=False)
 
-		print(self.bus)
 		self.udp_socket = None
 		self.listener = SubsystemsListener(subsystems)
 		self.notifier = can.Notifier(self.bus, [self.listener])
