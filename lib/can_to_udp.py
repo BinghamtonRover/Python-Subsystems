@@ -43,14 +43,10 @@ class CanToUdp:
 	def send(self, id, data): 
 		message = can.Message(arbitration_id=id, data=data, is_fd=False, is_extended_id=False)
 		try: 
-			print(f"  Sent:{''.join(hex(x)[2:].zfill(2) for x in data)}")
+			# print(f"  Sent:{''.join(hex(x)[2:].zfill(2) for x in data)}")
 			self.bus.send(message)
 		except can.exceptions.CanOperationError as error: 
 			print(f"  Error sending data to id={id}")
-			# if error.error_code == 105: return
-			# else: raise error from None
-			
-
 
 	def mock_send(self):  # sends without using the bus
 		data = DriveData(left=0.75).SerializeToString()
