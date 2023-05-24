@@ -2,7 +2,7 @@ import os
 os.system("sudo ip link set can0 up type can bitrate 500000")
 
 import lib.constants as constants
-from network import ProtoSocket
+from network import *
 from lib.can_to_udp import CanToUdp
 from lib.udp_to_can import UdpToCan
 
@@ -16,12 +16,5 @@ class Subsystems:
 		self.udp.close()
 
 subsystems = Subsystems()
-
-try: 
-	while True: 
-		try: subsystems.udp.listen()
-		except KeyboardInterrupt: break
-		except OSError as error: 
-			if error.errno in (10054, 101): continue
-			else: raise error
-finally: subsystems.close()
+thread = ServerThread(subsystems.udp)
+ServerThread.startThreads([thread])
