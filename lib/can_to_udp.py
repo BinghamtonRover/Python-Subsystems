@@ -28,6 +28,7 @@ class SubsystemsListener:
 		message = WrappedMessage(name=name, data=bytes(message.data))
 		self.subsystems.udp.send(message.SerializeToString())
 		if name == "DriveData":  # needs to be forwarded to the autonomy Pi
+			print(f"Got ultrasonic: {bytes(message.data)}")
 			self.subsystems.udp.send(message.SerializeToString(), address="192.168.1.30", port=8003)
 
 class CanToUdp: 
