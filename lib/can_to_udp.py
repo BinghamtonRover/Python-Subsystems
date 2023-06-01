@@ -22,12 +22,13 @@ class SubsystemsListener:
 		# NOTE: Calling socket.recvfrom causes a CAN frame of random IDs to be detected. 
 		# Does not occur in candump, only in python-can with socketcan
 		if id not in constants.CAN_ID_TO_NAME: return 
-		else: 
-			name = constants.CAN_ID_TO_NAME[id]
-			# print(f"Received {name} message from can ID {id}")
-			if self.subsystems.udp.destination is None: return  # dashboard is not connected
-			message = WrappedMessage(name=name, data=bytes(message.data))
-			self.subsystems.udp.send(message.SerializeToString())
+		name = constants.CAN_ID_TO_NAME[id]
+		# print(f"Received {name} message from can ID {id}")
+		if self.subsystems.udp.destination is None: return  # dashboard is not connected
+		message = WrappedMessage(name=name, data=bytes(message.data))
+		self.subsystems.udp.send(message.SerializeToString())
+		if name == "DriveData":  # needs to be forwarded to the autonomy Pi
+			self.subsystems.udp.send(message.SerializeToString(), address="192.168.1.30", port=8003)
 
 class CanToUdp: 
 	def __init__(self, subsystems, test=False): 
